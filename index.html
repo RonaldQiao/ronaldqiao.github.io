@@ -52,6 +52,32 @@
       color: inherit;            /* keep default text colour */
       text-decoration: underline;
     }
+
+    .name-preview-trigger {
+      cursor: default;
+      text-decoration: underline;
+      text-decoration-thickness: 0.05em;
+      text-underline-offset: 0.12em;
+    }
+
+    .name-preview {
+      position: fixed;
+      width: min(18rem, calc(100vw - 2rem));
+      max-height: calc(100vh - 2rem);
+      object-fit: contain;
+      border-radius: 0.35rem;
+      box-shadow: 0 1.1rem 2.8rem rgba(0, 0, 0, 0.22), 0 0.35rem 0.9rem rgba(0, 0, 0, 0.14);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate3d(0, 0, 0) scale(0.98);
+      transition: opacity 120ms ease, transform 120ms ease;
+      z-index: 10;
+    }
+
+    .name-preview.is-visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
   </style>
 </head>
 <body>
@@ -65,7 +91,7 @@
     <p>
       I currently live in Boston, MA and study at
       <a href="https://www.exeter.edu" target="_blank" rel="noopener noreferrer">
-        Phillips Exeter Academy</a>. I am an incoming freshman at <a href="https://www.yale.edu/">Yale</a>. Past:
+        Phillips Exeter Academy</a>. I am an incoming freshman at <a href="https://www.yale.edu/">Yale</a>. My Chinese name is <span class="name-preview-trigger" tabindex="0" aria-describedby="name-preview">若渊</span> (ruòyuān). Past:
     </p>
     <p>
       <a href="https://rossprogram.org" target="_blank" rel="noopener noreferrer">
@@ -74,6 +100,43 @@
     <p>Email: ronaldqiao7 [at] gmail.com, <br>ronald.qiao [at] yale.edu</p>
 
   </main>
+
+  <img id="name-preview" class="name-preview" src="the-manneport-etretat.jpg" alt="The Manneport, Etretat" />
+
+  <script>
+    const nameTrigger = document.querySelector('.name-preview-trigger');
+    const namePreview = document.querySelector('#name-preview');
+    const previewOffset = 18;
+
+    function positionPreview(event) {
+      const triggerRect = nameTrigger.getBoundingClientRect();
+      const pointerX = event.clientX ?? triggerRect.right;
+      const pointerY = event.clientY ?? triggerRect.top;
+      const previewRect = namePreview.getBoundingClientRect();
+      const maxX = window.innerWidth - previewRect.width - previewOffset;
+      const maxY = window.innerHeight - previewRect.height - previewOffset;
+      const x = Math.max(previewOffset, Math.min(pointerX + previewOffset, maxX));
+      const y = Math.max(previewOffset, Math.min(pointerY + previewOffset, maxY));
+
+      namePreview.style.left = `${x}px`;
+      namePreview.style.top = `${y}px`;
+    }
+
+    function showPreview(event) {
+      positionPreview(event);
+      namePreview.classList.add('is-visible');
+    }
+
+    function hidePreview() {
+      namePreview.classList.remove('is-visible');
+    }
+
+    nameTrigger.addEventListener('mouseenter', showPreview);
+    nameTrigger.addEventListener('mousemove', positionPreview);
+    nameTrigger.addEventListener('mouseleave', hidePreview);
+    nameTrigger.addEventListener('focus', showPreview);
+    nameTrigger.addEventListener('blur', hidePreview);
+  </script>
 
 </body>
 </html>
